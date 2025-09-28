@@ -55,11 +55,32 @@ class Snake {
     }
 }
 
+class collisionChecker {
+    checkWalls(snake, minBounds, maxBounds) {
+        const head = snake.segments[0];
+        return (head.x < minBounds || head.x >= maxBounds) || (head.y < minBounds || head.y >= maxBounds);
+    }
+
+    checkBody(snake) {
+        const segments = snake.segments;
+        const head = segments[0];
+
+        for (let i = 1; i < segments.length; i++) {
+            if (head.x === segments[i].x && head.y === segments[i].y) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 
 const snake = new Snake();
+const cc = new collisionChecker();
+let gameOver = false;
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.clientWidth, canvas.height);
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
     ctx.fillStyle = "white";
     for (let i = 0; i < snake.segments.length; i++) {
         let segment = snake.segments[i];
@@ -70,22 +91,37 @@ function draw() {
     if (snake.x_axis) {
         if (snake.is_forward) {
             snake.move(segment.x + CELL_SIZE, segment.y);
+            if (cc.checkWalls(snake, 0, 600) || cc.checkBody(snake)) {
+                gameOver = true;
+            }
         } else {
             snake.move(segment.x - CELL_SIZE, segment.y);
+            if (cc.checkWalls(snake, 0, 600) || cc.checkBody(snake)) {
+                gameOver = true;
+            }
         }
     } else {
         if (snake.is_forward) {
             snake.move(segment.x, segment.y - CELL_SIZE);
+            if (cc.checkWalls(snake, 0, 600) || cc.checkBody(snake)) {
+                gameOver = true;
+            }
         } else {
             snake.move(segment.x, segment.y + CELL_SIZE);
+            if (cc.checkWalls(snake, 0, 600) || cc.checkBody(snake)) {
+                gameOver = true;
+            }
         }
     }
-}
 
+    console.log(snake.segments[0].x)
+}
 
 draw();
 
 setInterval(() => {
-    draw();
+    if (!gameOver) {
+        draw();
+    }
 }, DRAW_SPEED);
 
