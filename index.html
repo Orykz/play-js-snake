@@ -10,11 +10,16 @@
 
 <body>
     <h1>Play Snake</h1>
-    <div class="score-container">
+    <div class="score container">
         <span>Score:</span>
         <span id="score">0</span>
     </div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <div class="game container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="start container" id="start">
+        </div>
+    </div>
 
     <script src="snake/script.js" type="module"></script>
 </body>

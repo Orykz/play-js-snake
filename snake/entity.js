@@ -7,8 +7,8 @@ class Segment {
 
 
 export class Snake {
-    constructor() {
-        // snake starts with 4 segments
+    constructor(size) {
+        this.size = size;
         this.segments = [
             new Segment(200, 200),
             new Segment(190, 200),
@@ -31,13 +31,12 @@ export class Snake {
 }
 
 export class Fruit {
-    constructor(minWidth, maxWidth, minHeight, maxHeight, outer_start, outer_end) {
-        this.minWidth = minWidth;
-        this.maxWidth = maxWidth;
-        this.minHeight = minHeight;
-        this.maxHeight = maxHeight;
-        this.outer_start = outer_start;
-        this.outer_end = outer_end;
+    constructor(fruitVar) {
+        this.size = fruitVar.size;
+        this.minWidth = fruitVar.minWidthPos;
+        this.maxWidth = fruitVar.maxWidthPos;
+        this.minHeight = fruitVar.minHeightPos;
+        this.maxHeight = fruitVar.maxHeightPos;
         this.generatePos();
     }
 
@@ -65,9 +64,14 @@ export class InputHandler {
 }
 
 export class CollisionChecker {
-    checkWalls(snake, minBounds, maxBounds) {
+    checkBoundsX(snake, minBounds, maxBounds) {
         const head = snake.segments[0];
-        return (head.x < minBounds || head.x >= maxBounds) || (head.y < minBounds || head.y >= maxBounds);
+        return head.x < minBounds || head.x >= maxBounds;
+    }
+
+    checkBoundsY(snake, minBounds, maxBounds) {
+        const head = snake.segments[0];
+        return head.y < minBounds || head.y >= maxBounds;
     }
 
     checkBody(snake) {
@@ -84,6 +88,6 @@ export class CollisionChecker {
 
     checkFruit(snake, fruit) {
         const head = snake.segments[0];
-        return head.x + fruit.outer_start === fruit.x && head.y + fruit.outer_start === fruit.y;
+        return head.x + fruit.minWidth === fruit.x && head.y + fruit.minHeight === fruit.y;
     }
 }
