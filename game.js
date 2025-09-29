@@ -88,6 +88,14 @@ class Snake {
     }
 }
 
+class InputHandler {
+    constructor() {
+        this.keys = {};
+        window.addEventListener("keydown", e => this.keys[e.key] = true);
+        window.addEventListener("keyup", e => this.keys[e.key] = false);
+    }
+}
+
 class CollisionChecker {
     checkWalls(snake, minBounds, maxBounds) {
         const head = snake.segments[0];
@@ -112,62 +120,110 @@ class CollisionChecker {
     }
 }
 
-
-const snake = new Snake();
+const gameState = {
+    snake: new Snake(),
+    fruit: new Fruit(),
+    score: 0,
+    gameOver: false,
+}
+const input = new InputHandler();
 const cc = new CollisionChecker();
-const fruit = new Fruit();
-let gameOver = false;
-let score = 0;
 
-function draw() {
-    ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+let gameOver = false;
+let lastTime = performance.now();
+
+function update(gameState) {
+    const snake = gameState.snake;
+    const head = snake.segments[0];
+
+    if (input.keys["ArrowUp"]) {
+        if (snake.x_axis) {
+            snake.x_axis = false;
+            snake.is_forward = true;
+        }
+    }
+
+    if (input.keys["ArrowDown"]) {
+        if (snake.x_axis) {
+            snake.x_axis = false;
+            snake.is_forward = false;
+        }
+    }
+
+    if (input.keys["ArrowLeft"]) {
+        if (!snake.x_axis) {
+            snake.x_axis = true;
+            snake.is_forward = false;
+        }
+    }
+
+    if (input.keys["ArrowRight"]) {
+        if (!snake.x_axis) {
+            snake.x_axis = true;
+            snake.is_forward = true;
+        }
+    }
+
+    if (snake.x_axis) {
+        if (snake.is_forward) {
+            snake.move(head.x + CELL_SIZE, head.y);
+        } else {
+            snake.move(head.x - CELL_SIZE, head.y);
+        }
+    } else {
+        if (snake.is_forward) {
+            snake.move(head.x, head.y - CELL_SIZE);
+        } else {
+            snake.move(head.x, head.y + CELL_SIZE);
+        }
+    }
+
+    console.log()
+}
+
+function draw(gameState) {
+    // Draw Snake
     ctx.fillStyle = "white";
+    const snake = gameState.snake;
     for (let i = 0; i < snake.segments.length; i++) {
         const segment = snake.segments[i];
         ctx.fillRect(segment.x, segment.y, CELL_SIZE, CELL_SIZE);
     }
 
-    const head = snake.segments[0];
-    if (snake.x_axis) {
-        if (snake.is_forward) {
-            snake.move(head.x + CELL_SIZE, head.y);
-            checkCollisions(snake, fruit);
-        } else {
-            snake.move(head.x - CELL_SIZE, head.y);
-            checkCollisions(snake, fruit);
-        }
-    } else {
-        if (snake.is_forward) {
-            snake.move(head.x, head.y - CELL_SIZE);
-            checkCollisions(snake, fruit);
-        } else {
-            snake.move(head.x, head.y + CELL_SIZE);
-            checkCollisions(snake, fruit);
-        }
-    }
-
-    // Fruit creation
+    // Draw Fruit
     ctx.fillStyle = "red";
+    const fruit = gameState.fruit;
     ctx.fillRect(fruit.x, fruit.y, FRUIT_SIZE, FRUIT_SIZE);
 }
 
-function checkCollisions(snake, fruit) {
+function checkCollisions(gameState) {
+    const snake = gameState.snake;
+    const fruit = gameState.fruit;
+
     if (cc.checkWalls(snake, MIN_WIDTH, MAX_WIDTH) || cc.checkBody(snake)) {
-        gameOver = true;
+        gameState.gameOver = true;
     }
 
     if (cc.checkFruit(snake, fruit)) {
-        score++;
-        document.getElementById("score").innerText = score;
+        gameState.score++;
+        document.getElementById("score").innerText = gameState.score;
         fruit.generatePos();
     }
 }
 
-draw();
+function gameLoop() {
+    if (gameState.gameOver) return;
+
+    // const currentTime = performance.now();
+    // const deltaTime = (currentTime - lastTime) / 1000;
+    // lastTime = currentTime;
+
+    ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+    update(gameState);
+    checkCollisions(gameState);
+    draw(gameState);
+}
 
 setInterval(() => {
-    if (!gameOver) {
-        draw();
-    }
-}, DRAW_SPEED);
-
+    gameLoop();
+}, 1000 / 20);
