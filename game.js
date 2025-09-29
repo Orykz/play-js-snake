@@ -10,10 +10,12 @@ const MAX_WIDTH = canvas.clientWidth;
 const MAX_HEIGHT = canvas.clientHeight;
 
 // min and max possible fruit positions
-const MIN_FRUIT_WIDTH = MIN_WIDTH + 2;
-const MAX_FRUIT_WIDTH = MAX_WIDTH - 8;
-const MIN_FRUIT_HEIGHT = MIN_HEIGHT + 2;
-const MAX_FRUIT_HEIGHT = MAX_HEIGHT - 8;
+const FRUIT_START = 2;
+const FRUIT_END = 8;
+const MIN_FRUIT_WIDTH = MIN_WIDTH + FRUIT_START;
+const MAX_FRUIT_WIDTH = MAX_WIDTH - FRUIT_END;
+const MIN_FRUIT_HEIGHT = MIN_HEIGHT + FRUIT_START;
+const MAX_FRUIT_HEIGHT = MAX_HEIGHT - FRUIT_END;
 
 document.addEventListener("keyup", (e) => {
     console.log(e.key);
@@ -103,52 +105,62 @@ class CollisionChecker {
         }
         return false;
     }
+
+    checkFruit(snake, fruit) {
+        const head = snake.segments[0];
+        return head.x + FRUIT_START === fruit.x && head.y + FRUIT_START === fruit.y;
+    }
 }
 
 
 const snake = new Snake();
 const cc = new CollisionChecker();
-const f = new Fruit();
+const fruit = new Fruit();
 let gameOver = false;
+let score = 0;
 
 function draw() {
     ctx.clearRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
     ctx.fillStyle = "white";
     for (let i = 0; i < snake.segments.length; i++) {
-        let segment = snake.segments[i];
+        const segment = snake.segments[i];
         ctx.fillRect(segment.x, segment.y, CELL_SIZE, CELL_SIZE);
     }
 
-    let segment = snake.segments[0];
+    const head = snake.segments[0];
     if (snake.x_axis) {
         if (snake.is_forward) {
-            snake.move(segment.x + CELL_SIZE, segment.y);
-            if (cc.checkWalls(snake, MIN_WIDTH, MAX_WIDTH) || cc.checkBody(snake)) {
-                gameOver = true;
-            }
+            snake.move(head.x + CELL_SIZE, head.y);
+            checkCollisions(snake, fruit);
         } else {
-            snake.move(segment.x - CELL_SIZE, segment.y);
-            if (cc.checkWalls(snake, MIN_HEIGHT, MAX_HEIGHT) || cc.checkBody(snake)) {
-                gameOver = true;
-            }
+            snake.move(head.x - CELL_SIZE, head.y);
+            checkCollisions(snake, fruit);
         }
     } else {
         if (snake.is_forward) {
-            snake.move(segment.x, segment.y - CELL_SIZE);
-            if (cc.checkWalls(snake, MIN_WIDTH, MAX_WIDTH) || cc.checkBody(snake)) {
-                gameOver = true;
-            }
+            snake.move(head.x, head.y - CELL_SIZE);
+            checkCollisions(snake, fruit);
         } else {
-            snake.move(segment.x, segment.y + CELL_SIZE);
-            if (cc.checkWalls(snake, MIN_HEIGHT, MAX_HEIGHT) || cc.checkBody(snake)) {
-                gameOver = true;
-            }
+            snake.move(head.x, head.y + CELL_SIZE);
+            checkCollisions(snake, fruit);
         }
     }
 
     // Fruit creation
     ctx.fillStyle = "red";
-    ctx.fillRect(f.x, f.y, FRUIT_SIZE, FRUIT_SIZE);
+    ctx.fillRect(fruit.x, fruit.y, FRUIT_SIZE, FRUIT_SIZE);
+}
+
+function checkCollisions(snake, fruit) {
+    if (cc.checkWalls(snake, MIN_WIDTH, MAX_WIDTH) || cc.checkBody(snake)) {
+        gameOver = true;
+    }
+
+    if (cc.checkFruit(snake, fruit)) {
+        score++;
+        document.getElementById("score").innerText = score;
+        fruit.generatePos();
+    }
 }
 
 draw();
