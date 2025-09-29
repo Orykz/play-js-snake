@@ -1,4 +1,4 @@
-import { gameLoop } from "/snake/run_game.js";
+import { gameLoop } from "/snake/game.js";
 
 setInterval(() => {
     gameLoop();
