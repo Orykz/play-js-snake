@@ -15,7 +15,7 @@ You can play the game live here: [**Play Snake**](https://orykz.github.io/play-j
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/Orykz/play-js-snake.git](https://github.com/Orykz/play-js-snake.git)
+    git clone https://github.com/Orykz/play-js-snake.git
     ```
 2.  **Navigate to the project directory:**
     ```bash
