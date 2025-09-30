@@ -42,10 +42,6 @@ function startGame() {
     run();
 }
 
-function retry() {
-    createStartBtn("Retry");
-}
-
 function run() {
     const gameState = {
         snake: new Snake(CELL_SIZE),
@@ -64,11 +60,12 @@ function run() {
         maxHeight: MAX_HEIGHT,
     }
 
+    document.getElementById("score").innerText = gameState.score;
     const interval = setInterval(() => {
         gameLoop(gameState, settings);
         if (gameState.gameOver) {
             clearInterval(interval);
-            retry();
+            createStartBtn("Retry");
         }
     }, 1000 / 20);
 }
