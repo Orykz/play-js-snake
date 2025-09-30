@@ -1,5 +1,5 @@
-import { gameLoop } from "./game.js";
-import { Snake, Fruit, InputHandler, CollisionChecker } from "./entity.js";
+import { gameLoop } from "https://orykz.github.io/play-js-snake/snake/game.js";
+import { Snake, Fruit, InputHandler, CollisionChecker } from "https://orykz.github.io/play-js-snake/snake/entity.js";
 
 
 const canvas = document.getElementById("gameCanvas");
